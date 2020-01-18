@@ -1,6 +1,16 @@
 # tagf_evaluation
  Evaluation of Traffic Predictive Analytics Guidance Framework (TAG-F). Three scenarios have been presented. Please see {} for thesis and/or paper.
  
+ Credits
+ ==========
+ Dr. Ilias Petrounias (Supervisor)
+ Dr. Pedro Sampaio (Supervisor)
+ Dr. Sandra Sampaio
+ Dr. Nadia Papamichail
+ Dr. Dimitris Dracopoulous
+ Dr. Jason Brownlee
+ 
+ 
  Synopsis
  ==========
  
