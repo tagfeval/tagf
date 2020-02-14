@@ -84,7 +84,7 @@ def experiment(train, test, config):
     model.fit(trainX, trainy, epochs=n_epochs, verbose=2, validation_split=0.2)
     # predict and evaluate
     #take previous observations
-    history = [x for x in train[-100:, :]]
+    history = [x for x in train]
     # walk-forward validation over each time step
     predictions = list()
     for i in range(len(test)):
@@ -106,11 +106,11 @@ def experiment(train, test, config):
 # create a list of configs to try
 def model_configs():
     # define scope of configs
-    n_input = [3]
-    n_layers = [5, 8, 16]
-    n_units = [16, 32]
-    n_epochs = [10, 20]
-    n_dropout = [0, 0.1]
+    n_input = [3, 5]
+    n_layers = [1, 2]
+    n_units = [10, 20, 30]
+    n_epochs = [50, 100]
+    n_dropout = [0, 0.1, 0.2, 0.3]
     # create configs
     configs = list()
     for a in n_input:

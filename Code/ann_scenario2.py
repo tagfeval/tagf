@@ -1,10 +1,13 @@
 # univariate ANN for scenario 1
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 import pandas as pd
 from sklearn.metrics import mean_squared_error
 import keras
+from keras import optimizers
+from sklearn.preprocessing import MinMaxScaler
  
 # split a nultivariate sequence into samples
 def to_supervised(train, n_input, n_out=1):
@@ -48,7 +51,7 @@ def split_dataset(data, data_split=0.2):
 
 #create base single layer
 def single_neuron(w_size, model, n_units, n_drop):
-    model.add(Dense(n_units, input_dim = 4))
+    model.add(Dense(n_units, input_dim = w_size*4, activation = 'relu'))
     #keras.layers.LeakyReLU(alpha=0.3)
     model.add(Dropout(n_drop))
     return model
@@ -62,7 +65,7 @@ def forecast(model, history, n_input):
     # retrieve last observations for input data
     input_x = data[-n_input:]
     # reshape data
-    input_x = input_x.reshape((1, 4))
+    input_x = input_x.reshape((1, n_input*4))
     # forecast the next week
     yhat = model.predict(input_x, verbose=0)
     # we only want the vector forecast
@@ -75,6 +78,7 @@ def experiment(train, test, config):
     w_size, n_layers, n_units, n_epochs, n_dropout = config
     # split into samples and targets
     trainX, trainy = to_supervised(train, w_size)
+    
     #flatten trainX
     trainX = trainX.reshape(trainX.shape[0], (trainX.shape[1]*trainX.shape[2]))
     # define model
@@ -84,13 +88,18 @@ def experiment(train, test, config):
         model = single_neuron(w_size, model, n_units, n_dropout)
     #specify output
     model.add(Dense(1))
-    model.compile(optimizer=keras.optimizers.RMSprop(lr=1e-3), loss='mse')
-
+    model.compile(optimizer=optimizers.Adam(), loss='mse')
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=20)
+    checkpointer = ModelCheckpoint(filepath="../Models/best_weights_TL.hdf5", 
+                           monitor = 'val_loss',
+                           verbose=2, 
+                           save_best_only=True)
+    callbacks_list = [checkpointer, es] #early
     # fit model
-    model.fit(trainX, trainy, epochs=n_epochs, verbose=2, validation_split=0.1)
+    model.fit(trainX, trainy, epochs=n_epochs, verbose=2, validation_split=0.2, callbacks=callbacks_list, batch_size=1000)
     # predict and evaluate
     #take previous observations
-    history = [x for x in train[-100:,]]
+    history = [x for x in train]
     # walk-forward validation over each time step
     predictions = list()
     for i in range(len(test)):
@@ -98,12 +107,7 @@ def experiment(train, test, config):
         yhat_sequence = forecast(model, history, w_size)
         # store the predictions
         predictions.append(yhat_sequence)
-        if i >30:
-            for s in range(30):
-                dat = test[(i-s)]
-                history.append(dat)
-            i=1
-        i+=1
+        history.append(test[i, :])
     # evaluate predictions days for each timestep
     predictions = np.array(predictions)
     print(predictions.shape, test.shape)
@@ -118,11 +122,11 @@ def experiment(train, test, config):
 # create a list of configs to try
 def model_configs():
     # define scope of configs
-    n_input = [1]
-    n_layers = [8]
-    n_units = [16]
-    n_epochs = [10]
-    n_dropout = [0, 0.1]
+    n_input = [10]
+    n_layers = [1, 2, 8]
+    n_units = [10, 20, 30, 16]
+    n_epochs = [500]
+    n_dropout = [0]
     # create configs
     configs = list()
     for a in n_input:
@@ -140,14 +144,14 @@ def model_configs():
 def grid_search(cfg_list):
     # evaluate configs
     result = [repeat_evaluate(train, test, cfg) for cfg in cfg_list]
-    pd.DataFrame(result).to_csv('../Data/scores_scenario2.csv')
+    pd.DataFrame(result).to_csv('../Results/scores_scenario2.csv')
     # sort configs by error, asc
     result.sort(key=lambda tup: tup[1])
     return (result)
 
 
 # score a model, return None on failure
-def repeat_evaluate(train, test, config, n_repeats=3):
+def repeat_evaluate(train, test, config, n_repeats=1):
     # unpack config
     w_size, n_layers, n_units, n_epochs, n_dropout = config
     # convert config to a key
@@ -167,7 +171,24 @@ data  = pd.read_csv('../Data/Scenario2.csv', header=0, index_col=0)
 #fill missing values
 data = data.fillna(method='ffill')
 #split dataset
-train, test = split_dataset(data, 1100)
+train, test = split_dataset(data, 200)
+#scale data
+train = train.reshape(train.shape[0], train.shape[2])
+test = test.reshape(test.shape[0], test.shape[2])
+
+scaler = MinMaxScaler(feature_range=(0, 1))
+
+train_x = scaler.fit_transform(train[:, :-1])
+test_x = scaler.fit_transform(test[:, :-1])
+#add scaled data to target
+train = np.append(train_x, train[:, -1].reshape(len(train),1), axis=1)
+test = np.append(test_x, test[:, -1].reshape(len(test),1), axis=1)
+#reshape train and test
+train = train.reshape(train.shape[0], 1, train.shape[1])
+test = test.reshape(test.shape[0], 1, test.shape[1])
+
+del train_x, test_x
+
 # model configs
 cfg_list = model_configs()
 # grid search
