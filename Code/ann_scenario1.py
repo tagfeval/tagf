@@ -79,9 +79,9 @@ def experiment(train, test, config):
         model = single_neuron(w_size, model, n_units, n_dropout)
     #specify output
     model.add(Dense(1))
-    model.compile(optimizer='rmsprop', loss='mse')
+    model.compile(optimizer='adam', loss='mse')
     # fit model
-    model.fit(trainX, trainy, epochs=n_epochs, verbose=2, validation_split=0.2)
+    model.fit(trainX, trainy, epochs=n_epochs, verbose=0, validation_split=0.2, batch_size=1000, shuffle=False)
     # predict and evaluate
     #take previous observations
     history = [x for x in train]
@@ -97,8 +97,9 @@ def experiment(train, test, config):
     # evaluate predictions days for each week
     predictions = np.array(predictions)
     rmse = np.sqrt(mean_squared_error(test, predictions))
-    print('Config: '+str(config))
-    print('The RMSE for Model with '+str(n_layers)+' hidden layers is: '+str(rmse))
+    mae = np.mean(np.abs(test - predictions))
+    print('MAE for Config: ', config, 'is ', mae)
+    print('RMSE for Config: ', config, 'is ', rmse)
     return rmse
 
 
@@ -106,11 +107,11 @@ def experiment(train, test, config):
 # create a list of configs to try
 def model_configs():
     # define scope of configs
-    n_input = [3, 5]
-    n_layers = [1, 2]
-    n_units = [10, 20, 30]
-    n_epochs = [50, 100]
-    n_dropout = [0, 0.1, 0.2, 0.3]
+    n_input = [5,10]
+    n_layers = [8]
+    n_units = [16]
+    n_epochs = [500]
+    n_dropout = [0]
     # create configs
     configs = list()
     for a in n_input:
@@ -128,7 +129,7 @@ def model_configs():
 def grid_search(cfg_list):
     # evaluate configs
     result = [repeat_evaluate(train, test, cfg) for cfg in cfg_list]
-    pd.DataFrame(result).to_csv('../Data/scores_scenario1.csv')
+#    pd.DataFrame(result).to_csv('../Data/scores_scenario1.csv')
     # sort configs by error, asc
     result.sort(key=lambda tup: tup[1])
     return (result)

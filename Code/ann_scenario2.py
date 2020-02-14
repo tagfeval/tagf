@@ -88,7 +88,7 @@ def experiment(train, test, config):
         model = single_neuron(w_size, model, n_units, n_dropout)
     #specify output
     model.add(Dense(1))
-    model.compile(optimizer=optimizers.Adam(), loss='mse')
+    model.compile(optimizer=optimizers.Adam(lr=1e-5), loss='mse')
     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=20)
     checkpointer = ModelCheckpoint(filepath="../Models/best_weights_TL.hdf5", 
                            monitor = 'val_loss',
@@ -113,6 +113,8 @@ def experiment(train, test, config):
     print(predictions.shape, test.shape)
     test = test[:, :, -1]
     rmse = np.sqrt(mean_squared_error(test, predictions))
+    mae = np.mean(np.abs(test - predictions))
+    print(mae)
     print('Config: '+str(config))
     print('The RMSE for Model with '+str(n_layers)+' hidden layers is: '+str(rmse))
     return rmse
@@ -125,7 +127,7 @@ def model_configs():
     n_input = [10]
     n_layers = [1, 2, 8]
     n_units = [10, 20, 30, 16]
-    n_epochs = [500]
+    n_epochs = [5]
     n_dropout = [0]
     # create configs
     configs = list()
@@ -171,7 +173,7 @@ data  = pd.read_csv('../Data/Scenario2.csv', header=0, index_col=0)
 #fill missing values
 data = data.fillna(method='ffill')
 #split dataset
-train, test = split_dataset(data, 200)
+train, test = split_dataset(data, 1100)
 #scale data
 train = train.reshape(train.shape[0], train.shape[2])
 test = test.reshape(test.shape[0], test.shape[2])
