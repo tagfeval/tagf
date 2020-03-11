@@ -79,7 +79,7 @@ def build_model(train, n_input):
     # prepare data
     train_x, train_y = to_supervised(train, n_input)
     # define parameters
-    verbose, epochs, batch_size = 2, 10, 128
+    verbose, epochs, batch_size = 2, 100, 128
     n_timesteps, n_features, n_outputs = train_x.shape[1], train_x.shape[2], train_y.shape[1] 
     # define model
     model = Sequential()
@@ -149,7 +149,7 @@ dataset = dataset.iloc[:-1, :]
 train, test = split_dataset(dataset.values, 5376)
 train, trainy = train[:, :, :-1], train[:, :, -1]
 test, testy = test[:, :, :-1], test[:, :, -1]
-# standardize the data
+# standardize
 mu = np.mean(train)
 sig = np.std(train)
 
