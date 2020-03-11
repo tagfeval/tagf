@@ -125,8 +125,8 @@ def experiment(train, test, config):
 def model_configs():
     # define scope of configs
     n_input = [10]
-    n_layers = [1, 2, 8]
-    n_units = [10, 20, 30, 16]
+    n_layers = [8]
+    n_units = [10]
     n_epochs = [5]
     n_dropout = [0]
     # create configs
@@ -178,18 +178,18 @@ train, test = split_dataset(data, 1100)
 train = train.reshape(train.shape[0], train.shape[2])
 test = test.reshape(test.shape[0], test.shape[2])
 
-scaler = MinMaxScaler(feature_range=(0, 1))
+#scaler = MinMaxScaler(feature_range=(0, 1))
 
-train_x = scaler.fit_transform(train[:, :-1])
-test_x = scaler.fit_transform(test[:, :-1])
+#train_x = scaler.fit_transform(train[:, :-1])
+#test_x = scaler.fit_transform(test[:, :-1])
 #add scaled data to target
-train = np.append(train_x, train[:, -1].reshape(len(train),1), axis=1)
-test = np.append(test_x, test[:, -1].reshape(len(test),1), axis=1)
+#train = np.append(train_x, train[:, -1].reshape(len(train),1), axis=1)
+#test = np.append(test_x, test[:, -1].reshape(len(test),1), axis=1)
 #reshape train and test
 train = train.reshape(train.shape[0], 1, train.shape[1])
 test = test.reshape(test.shape[0], 1, test.shape[1])
 
-del train_x, test_x
+#del train_x, test_x
 
 # model configs
 cfg_list = model_configs()
