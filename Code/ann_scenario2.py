@@ -88,7 +88,7 @@ def experiment(train, test, config):
         model = single_neuron(w_size, model, n_units, n_dropout)
     #specify output
     model.add(Dense(1))
-    model.compile(optimizer=optimizers.Adam(lr=1e-5), loss='mse')
+    model.compile(optimizer=optimizers.Adam(lr=1e-3), loss='mse')
     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=20)
     checkpointer = ModelCheckpoint(filepath="../Models/best_weights_TL.hdf5", 
                            monitor = 'val_loss',
@@ -125,9 +125,9 @@ def experiment(train, test, config):
 def model_configs():
     # define scope of configs
     n_input = [10]
-    n_layers = [8]
-    n_units = [10]
-    n_epochs = [5]
+    n_layers = [8, 1, 2, 3]
+    n_units = [10, 20, 30, 16]
+    n_epochs = [50, 100]
     n_dropout = [0]
     # create configs
     configs = list()
@@ -153,7 +153,7 @@ def grid_search(cfg_list):
 
 
 # score a model, return None on failure
-def repeat_evaluate(train, test, config, n_repeats=1):
+def repeat_evaluate(train, test, config, n_repeats=30):
     # unpack config
     w_size, n_layers, n_units, n_epochs, n_dropout = config
     # convert config to a key
