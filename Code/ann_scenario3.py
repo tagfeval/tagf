@@ -114,10 +114,10 @@ def experiment(train, test, config):
 # create a list of configs to try
 def model_configs():
     # define scope of configs
-    n_input = [5]
-    n_layers = [8]
-    n_units = [16]
-    n_epochs = [1]
+    n_input = [5, 10]
+    n_layers = [8, 16, 32]
+    n_units = [16, 100, 200]
+    n_epochs = [100, 200, 300]
     n_dropout = [0, 0.1]
     # create configs
     configs = list()
@@ -143,7 +143,7 @@ def grid_search(cfg_list):
 
 
 # score a model, return None on failure
-def repeat_evaluate(train, test, config, n_repeats=3):
+def repeat_evaluate(train, test, config, n_repeats=30):
     # unpack config
     w_size, n_layers, n_units, n_epochs, n_dropout = config
     # convert config to a key
