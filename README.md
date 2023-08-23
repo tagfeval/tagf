@@ -17,6 +17,11 @@ demand across all transport networks" (Catapult 2015, p.8), and the importance o
 
 Based on the reasons given above, there is a need to provide guidance to traffic data analysts in carrying out TPA. While there are existing traffic systems that provide guidance to road users in the form of route guidance and traffic state information using Advanced Traveller Information Systems (ATIS), e.g., Google Maps, Waze, and Garmin, etc., to the best of our knowledge, there is currently no system able to provide guidance to analysts towards performing TPA. This is what TAG-F aims to provide. TAG-F delineates data-driven traffic prediction as a set of three dimensions, thereby providing a structured collection of analytical decision points that can serve as a roadmap to enable the traffic data scientist traverse from the traffic problem space to the analytical solution space, culminating in an action/outcome, usually prediction. TAG-F can also serve as a decision support mechanism for traffic data scientists by providing guidance in the choice of a predictive model, given the traffic data context specifications. 
 
+Our research contributions include:
+1. Conceptualization and design of a decisional guidance framework that supports traffic data analysts in performing data-driven TPA, including a mechanism for transferring data analysis experience in the form of critical analysis of PAMs (Code within this repository).
+2. A meta-learning model for ranking a list of PAM(s) for each given TPA scenario and the development of a prototype tool that instantiates the TAG-F framework to support decision-making.
+3. Framing of a nascent design theory of traffic analytics decisional guidance.
+
 # 2. Traffic Predictive Analytics (TPA) Guidance Framework
 ![alt text](https://github.com/tagfeval/tagf/blob/master/Picture1.png)
 The figure above shows a conceptual model of the guidance offered by TAG-F. The overall aim is to guide or assist the traffic data analyst to traverse (i.e. navigate) from a state in which the solution path is unknown/unclear to a point where this path (i.e. towards achieving the solution) is clearly defined. In the figure, this is represented using the bold arrow at the bottom, indicating a traversal from the bottom left to the bottom right. 
